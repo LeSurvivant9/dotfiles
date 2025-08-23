@@ -12,8 +12,7 @@ zinit light zsh-users/zsh-autosuggestions
 zinit light Aloxaf/fzf-tab
 zinit load atuinsh/atuin
 
-# Add in snippets
-zinit snippet OMZP::brew
+# Add in snippets (Linux-compatible only)
 zinit snippet OMZP::bun
 zinit snippet OMZP::colorize
 zinit snippet OMZP::command-not-found
@@ -22,11 +21,9 @@ zinit snippet OMZP::copypath
 zinit snippet OMZP::docker
 zinit snippet OMZP::docker-compose
 zinit snippet OMZP::dotenv
-zinit snippet OMZP::emoji
 zinit snippet OMZP::fzf
 zinit snippet OMZL::git.zsh
 zinit snippet OMZP::git
-zinit snippet OMZP::macos
 zinit snippet OMZP::nvm
 zinit snippet OMZP::python
 zinit snippet OMZP::safe-paste
@@ -67,7 +64,18 @@ alias c='clear'
 
 # Shell integrations
 eval "$(starship init zsh)"
-eval "$(/opt/homebrew/bin/brew shellenv)"
-eval "$(fzf --zsh)"
-. "$HOME/.local/bin/env"
-eval "$(atuin init zsh)"
+
+# Homebrew (Linuxbrew) integration
+if [ -d "$HOME/.linuxbrew/bin" ]; then
+    eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+fi
+
+# fzf
+if command -v fzf >/dev/null 2>&1; then
+    eval "$(fzf --zsh)"
+fi
+
+# Atuín
+if command -v atuin >/dev/null 2>&1; then
+    eval "$(atuin init zsh)"
+fi
