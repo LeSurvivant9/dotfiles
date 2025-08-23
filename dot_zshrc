@@ -66,13 +66,17 @@ alias c='clear'
 eval "$(starship init zsh)"
 
 # Homebrew (Linuxbrew) integration
-if [ -d "$HOME/.linuxbrew/bin" ]; then
-    eval "$($HOME/.linuxbrew/bin/brew shellenv)"
+if [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
+    export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+    export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
+    export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
 fi
 
 # fzf
 if command -v fzf >/dev/null 2>&1; then
-    eval "$(fzf --zsh)"
+    # Charge les complétions et keybindings si le fichier existe
+    [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+    [ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
 fi
 
 # Atuín
