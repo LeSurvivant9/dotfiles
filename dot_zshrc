@@ -62,6 +62,7 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 alias ls='ls --color'
 alias vim='nvim'
 alias c='clear'
+alias l='ls -lFha'
 
 # Shell integrations
 eval "$(starship init zsh)"
