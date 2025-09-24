@@ -17,6 +17,7 @@ zinit snippet OMZP::bun
 zinit snippet OMZP::colorize
 zinit snippet OMZP::command-not-found
 zinit snippet OMZP::common-aliases
+zinit snippet OMZP::composer
 zinit snippet OMZP::copypath
 zinit snippet OMZP::docker
 zinit snippet OMZP::docker-compose
@@ -29,6 +30,7 @@ zinit snippet OMZP::postgres
 zinit snippet OMZP::python
 zinit snippet OMZP::safe-paste
 zinit snippet OMZP::ssh
+zinit snippet OMZP::symfony
 
 # Keybindings
 bindkey '^p' history-search-backward
@@ -113,4 +115,11 @@ if [ -d "$HOME/.nvm" ]; then
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+fi
+
+# Symfony
+if command -v symfony >/dev/null 2>&1; then
+    # Autocomplétion Symfony CLI
+    [[ -f "$HOME/.symfony_completion" ]] || symfony completion zsh > "$HOME/.symfony_completion"
+    source "$HOME/.symfony_completion"
 fi
