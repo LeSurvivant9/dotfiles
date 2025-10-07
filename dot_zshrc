@@ -123,3 +123,9 @@ if command -v symfony >/dev/null 2>&1; then
     [[ -f "$HOME/.symfony_completion" ]] || symfony completion zsh > "$HOME/.symfony_completion"
     source "$HOME/.symfony_completion"
 fi
+
+# Bun (local install)
+if [ -d "${BUN_INSTALL:-$HOME/.bun}/bin" ]; then
+  export PATH="${BUN_INSTALL:-$HOME/.bun}/bin:$PATH"
+fi
+
