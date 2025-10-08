@@ -5,6 +5,9 @@ ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 source "${ZINIT_HOME}/zinit.zsh"
 ###
 
+# ——— NVM (auto-switch via plugin) ———
+export NVM_AUTO_USE=true
+
 # Add zsh plugins
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
@@ -110,13 +113,6 @@ if command -v atuin >/dev/null 2>&1; then
     eval "$(atuin init zsh)"
 fi
 
-# NVM
-if [ -d "$HOME/.nvm" ]; then
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-fi
-
 # Symfony
 if command -v symfony >/dev/null 2>&1; then
     # Autocomplétion Symfony CLI
@@ -128,4 +124,3 @@ fi
 if [ -d "${BUN_INSTALL:-$HOME/.bun}/bin" ]; then
   export PATH="${BUN_INSTALL:-$HOME/.bun}/bin:$PATH"
 fi
-
