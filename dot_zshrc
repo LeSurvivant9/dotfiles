@@ -79,12 +79,6 @@ if [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
     export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
 fi
 
-# Homebrew (MacOS)
-if [ -d "/opt/homebrew/" ]; then
-    export PATH="/opt/homebrew/:$PATH"
-fi
-
-
 # fzf
 if command -v fzf >/dev/null 2>&1; then
     # Charge les complétions et keybindings si le fichier existe
@@ -108,3 +102,5 @@ fi
 if [ -d "${BUN_INSTALL:-$HOME/.bun}/bin" ]; then
   export PATH="${BUN_INSTALL:-$HOME/.bun}/bin:$PATH"
 fi
+
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
