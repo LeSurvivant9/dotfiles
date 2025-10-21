@@ -104,3 +104,4 @@ if [ -d "${BUN_INSTALL:-$HOME/.bun}/bin" ]; then
 fi
 
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+export SSH_AUTH_SOCK=/Users/ls/.bitwarden-ssh-agent.sock
