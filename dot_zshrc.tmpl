@@ -1,3 +1,5 @@
+{{- /* Common, OS-agnostic setup first */ -}}
+
 ### ZINIT
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 [ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
@@ -5,20 +7,19 @@ ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 source "${ZINIT_HOME}/zinit.zsh"
 ###
 
-# ——— NVM (auto-switch via plugin) ———
+# NVM (auto-switch via plugin)
 export NVM_AUTO_USE=true
 
-# Add zsh plugins
+# Core plugins (cross-platform)
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light Aloxaf/fzf-tab
 zinit load atuinsh/atuin
 
-# Add in snippets (Linux-compatible only)
+# OMZ snippets that are generally portable
 zinit snippet OMZP::bun
 zinit snippet OMZP::colorize
-zinit snippet OMZP::command-not-found
 zinit snippet OMZP::common-aliases
 zinit snippet OMZP::composer
 zinit snippet OMZP::copypath
@@ -63,8 +64,7 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 
-# Aliases
-alias ls='ls --color'
+# Generic aliases (OS-specific ones below)
 alias vim='nvim'
 alias c='clear'
 alias l='ls -lFha'
@@ -72,36 +72,114 @@ alias l='ls -lFha'
 # Shell integrations
 eval "$(starship init zsh)"
 
-# Homebrew (Linuxbrew) integration
-if [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
-    export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-    export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
-    export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
-fi
-
-# fzf
-if command -v fzf >/dev/null 2>&1; then
-    # Charge les complétions et keybindings si le fichier existe
-    [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
-    [ -f /usr/share/doc/fzf/examples/completion.zsh ] && source /usr/share/doc/fzf/examples/completion.zsh
-fi
-
-# Atuín
-if command -v atuin >/dev/null 2>&1; then
-    eval "$(atuin init zsh)"
-fi
-
-# Symfony
-if command -v symfony >/dev/null 2>&1; then
-    # Autocomplétion Symfony CLI
-    [[ -f "$HOME/.symfony_completion" ]] || symfony completion zsh > "$HOME/.symfony_completion"
-    source "$HOME/.symfony_completion"
-fi
-
+# Language/tool shims
 # Bun (local install)
 if [ -d "${BUN_INSTALL:-$HOME/.bun}/bin" ]; then
   export PATH="${BUN_INSTALL:-$HOME/.bun}/bin:$PATH"
 fi
 
-export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
-export SSH_AUTH_SOCK=/Users/ls/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock
+# Atuin (if present)
+{{- if lookPath "atuin" }}
+  eval "$(atuin init zsh)"
+{{- end }}
+
+# Symfony CLI completion (if present)
+{{- if lookPath "symfony" }}
+  [[ -f "$HOME/.symfony_completion" ]] || symfony completion zsh > "$HOME/.symfony_completion"
+  source "$HOME/.symfony_completion"
+{{- end }}
+
+# fzf keybindings & completion (paths vary by OS/distro)
+{{- $os := .chezmoi.os -}}
+{{- $rel := .chezmoi.osRelease -}}
+{{- $id := default "" (index $rel "ID") -}}
+{{- $like := default "" (index $rel "ID_LIKE") -}}
+{{- $isArch := and (eq $os "linux") (eq $id "arch") -}}
+{{- $isDebianLike := and (eq $os "linux") (or (eq $id "debian") (contains "debian" $like)) -}}
+{{- $isUbuntu := and (eq $os "linux") (or (eq $id "ubuntu") (contains "ubuntu" $like)) -}}
+{{- $isRaspbian := and (eq $os "linux") (or (eq $id "raspbian") (contains "raspbian" $like)) -}}
+
+{{- if lookPath "fzf" }}
+  {{- if eq $os "darwin" }}
+    # Homebrew installs
+    {{- if lookPath "brew" }}
+      FZF_PREFIX="$(brew --prefix)/opt/fzf"
+      [ -f "$FZF_PREFIX/shell/key-bindings.zsh" ] && source "$FZF_PREFIX/shell/key-bindings.zsh"
+      [ -f "$FZF_PREFIX/shell/completion.zsh" ] && source "$FZF_PREFIX/shell/completion.zsh"
+    {{- end }}
+  {{- else if $isArch }}
+      [ -f /usr/share/fzf/key-bindings.zsh ] && source /usr/share/fzf/key-bindings.zsh
+      [ -f /usr/share/fzf/completion.zsh ]   && source /usr/share/fzf/completion.zsh
+  {{- else }}
+      # Debian/Ubuntu/Raspbian often ship examples here
+      [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
+      [ -f /usr/share/doc/fzf/examples/completion.zsh ]   && source /usr/share/doc/fzf/examples/completion.zsh
+  {{- end }}
+{{- end }}
+
+# ---------------- OS/Distro specific blocks ----------------
+
+{{- if eq $os "darwin" }}
+  # macOS specific
+  # Prefer BSD ls coloring; adjust alias
+  alias ls='ls -G'
+
+  # LLVM from Homebrew (if installed)
+  export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+
+  # Bitwarden SSH agent socket (macOS app sandbox)
+  export SSH_AUTH_SOCK="$HOME/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock"
+
+  # command-not-found equivalent via Homebrew (official handler)
+  {{- if lookPath "brew" }}
+    HOMEBREW_COMMAND_NOT_FOUND_HANDLER="$(brew --repository)/Library/Homebrew/command-not-found/handler.sh"
+    if [ -f "$HOMEBREW_COMMAND_NOT_FOUND_HANDLER" ]; then
+      source "$HOMEBREW_COMMAND_NOT_FOUND_HANDLER";
+    fi
+  {{- end }}
+{{- end }}
+
+{{- if eq $os "linux" }}
+  # Linux generic settings valid for Arch, Ubuntu (WSL), Raspbian
+
+  # Use GNU ls colors by default
+  alias ls='ls --color'
+
+  # Linuxbrew (if present)
+  if [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
+      export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+      export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
+      export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
+  fi
+
+  # Command-not-found handler
+  {{- if $isArch }}
+    # Arch Linux: use pkgfile's handler (requires: sudo pacman -S pkgfile; then `pkgfile -u`)
+    if [ -f /usr/share/doc/pkgfile/command-not-found.zsh ]; then
+      source /usr/share/doc/pkgfile/command-not-found.zsh
+    else
+      # Fallback to OMZ plugin if pkgfile handler not found
+      zinit snippet OMZP::command-not-found
+    fi
+  {{- else }}
+    # Non-Arch Linux: use OMZ plugin
+    zinit snippet OMZP::command-not-found
+  {{- end }}
+
+  # WSL-specific tweaks (runtime detection; covers Ubuntu via WSL)
+  if grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then
+    command -v clip.exe >/dev/null 2>&1 && alias clip='clip.exe'
+    [ -z "$DISPLAY" ] && export DISPLAY="$(grep -m 1 nameserver /etc/resolv.conf | awk '{print $2}')":0
+  fi
+
+  # Distro-specific hooks (placeholders for future needs)
+  {{- if $isArch }}
+    # Arch-specific adjustments can go here
+  {{- end }}
+  {{- if $isUbuntu }}
+    # Ubuntu-specific adjustments can go here
+  {{- end }}
+  {{- if $isRaspbian }}
+    # Raspbian-specific adjustments can go here
+  {{- end }}
+{{- end }}
