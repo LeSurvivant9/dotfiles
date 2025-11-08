@@ -15,7 +15,9 @@ zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 zinit light Aloxaf/fzf-tab
-zinit load atuinsh/atuin
+{{- if not ((stat (joinPath .chezmoi.homeDir ".atuin/bin")).isDir) }}
+  zinit load atuinsh/atuin
+{{- end }}
 
 # OMZ snippets that are generally portable
 zinit snippet OMZP::bun
@@ -88,6 +90,12 @@ eval "$(starship init zsh)"
 # Bun (local install)
 if [ -d "${BUN_INSTALL:-$HOME/.bun}/bin" ]; then
   export PATH="${BUN_INSTALL:-$HOME/.bun}/bin:$PATH"
+fi
+
+# Atuin standalone install (curl) bootstrap
+if [ -d "$HOME/.atuin/bin" ]; then
+  export PATH="$HOME/.atuin/bin:$PATH"
+  [ -f "$HOME/.atuin/bin/env" ] && source "$HOME/.atuin/bin/env"
 fi
 
 # Atuin (if present)
