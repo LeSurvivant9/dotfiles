@@ -64,10 +64,22 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 
-# Generic aliases (OS-specific ones below)
+# Generic aliases
 alias vim='nvim'
 alias c='clear'
-alias l='ls -lFha'
+# b => bat
+{{- if lookPath "bat" }}
+  alias b='bat'
+{{- else }}
+  # bat non installé: installez-le avec Homebrew (brew install bat)
+  # On ne stoppe pas le chargement du shell; l'alias ne sera pas défini.
+{{- end }}
+# l => eza listing (prefer eza if available)
+{{- if lookPath "eza" }}
+  alias l='eza -l -F -h -a --group-directories-first --icons=auto'
+{{- else }}
+  alias l='ls -lFha'
+{{- end }}
 
 # Shell integrations
 eval "$(starship init zsh)"
@@ -120,10 +132,6 @@ fi
 # ---------------- OS/Distro specific blocks ----------------
 
 {{- if eq $os "darwin" }}
-  # macOS specific
-  # Prefer BSD ls coloring; adjust alias
-  alias ls='ls -G'
-
   # LLVM from Homebrew (if installed)
   export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 
@@ -141,9 +149,6 @@ fi
 
 {{- if eq $os "linux" }}
   # Linux generic settings valid for Arch, Ubuntu (WSL), Raspbian
-
-  # Use GNU ls colors by default
-  alias ls='ls --color'
 
   # Linuxbrew (if present)
   if [ -d "/home/linuxbrew/.linuxbrew/bin" ]; then
