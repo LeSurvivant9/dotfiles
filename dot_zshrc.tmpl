@@ -98,6 +98,12 @@ if [ -d "$HOME/.atuin/bin" ]; then
   [ -f "$HOME/.atuin/bin/env" ] && source "$HOME/.atuin/bin/env"
 fi
 
+# uv (Astral) standalone install
+if [ -d "$HOME/.local/bin" ]; then
+  export PATH="$HOME/.local/bin:$PATH"
+  [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
+fi
+
 # Atuin (if present)
 {{- if lookPath "atuin" }}
   eval "$(atuin init zsh)"
