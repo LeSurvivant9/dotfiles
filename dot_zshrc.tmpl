@@ -69,6 +69,8 @@ zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 # Generic aliases
 alias vim='nvim'
 alias c='clear'
+alias sudo='sudo '
+alias ubun-attach="sudo lxc-attach -n ubun --clear-env -v TERM=xterm-256color"
 # b => bat
 {{- if lookPath "bat" }}
   alias b='bat'
