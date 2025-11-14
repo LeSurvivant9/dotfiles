@@ -149,8 +149,15 @@ fi
   # LLVM from Homebrew (if installed)
   export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 
-  # Bitwarden SSH agent socket (macOS app sandbox)
-  export SSH_AUTH_SOCK="$HOME/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock"
+  # Bitwarden SSH agent socket (macOS)
+  # Prefer the .dmg install socket, fall back to Mac App Store container path.
+  if [ -S "$HOME/.bitwarden-ssh-agent.sock" ]; then
+    export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
+  elif [ -S "$HOME/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock" ]; then
+    export SSH_AUTH_SOCK="$HOME/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock"
+  fi
+  # Also export SSH_AUTH_SOCKET for compatibility with launchctl-based setups
+  [ -n "$SSH_AUTH_SOCK" ] && export SSH_AUTH_SOCKET="$SSH_AUTH_SOCK"
 
   # command-not-found equivalent via Homebrew (official handler)
   {{- if lookPath "brew" }}
@@ -169,6 +176,11 @@ fi
       export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
       export MANPATH="/home/linuxbrew/.linuxbrew/share/man:$MANPATH"
       export INFOPATH="/home/linuxbrew/.linuxbrew/share/info:$INFOPATH"
+  fi
+
+  # Bitwarden SSH agent socket (Linux)
+  if [ -S "$HOME/.bitwarden-ssh-agent.sock" ]; then
+    export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
   fi
 
   # Command-not-found handler
