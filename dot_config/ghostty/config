@@ -1,0 +1,3 @@
+theme = Catppuccin Mocha
+cursor-style = bar
+shell-integration-features = no-cursor,no-sudo,title,no-ssh-env,no-ssh-terminfo,path
