@@ -143,7 +143,7 @@ label:focus {
 }
 
 #network.disconnected {
-    background-color: #f53c3c;
+    background-color: #f53cpkill waybar && waybar &3c;
 }
 
 #pulseaudio {
@@ -177,6 +177,20 @@ label:focus {
 
 #custom-media.custom-vlc {
     background-color: #ffa000;
+}
+
+#custom-power {
+    margin-right: 15px;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: #ffffff;
+    font-size: 20px;
+}
+
+#custom-power:hover {
+    background-color: #ff5555;
+    color: #ffffff;
+    border-radius: 5px;
 }
 
 #temperature {
