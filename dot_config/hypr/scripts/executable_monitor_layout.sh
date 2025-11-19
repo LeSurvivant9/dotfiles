@@ -4,7 +4,7 @@
 options="Étendre\nDupliquer (Miroir)\nDP-1 Uniquement\nDP-2 Uniquement"
 
 # Affiche le menu Rofi
-choice=$(echo -e "$options" | rofi -dmenu -p "Affichage")
+choice=$(echo "$options" | rofi -dmenu -p "Affichage")
 
 # Fonction pour recharger l'interface (Waybar + Wallpaper)
 reload_ui() {
