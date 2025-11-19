@@ -117,6 +117,12 @@ fi
   source "$HOME/.symfony_completion"
 {{- end }}
 
+# Cargo (if present)
+{{- if lookPath "cargo" }}
+  export PATH="$HOME/.cargo/bin:$PATH"
+  [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+{{- end -}}
+
 # fzf keybindings & completion (paths vary by OS/distro)
 {{- $os := .chezmoi.os -}}
 {{- $rel := .chezmoi.osRelease -}}
