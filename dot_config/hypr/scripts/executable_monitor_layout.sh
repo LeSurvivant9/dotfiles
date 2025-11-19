@@ -1,10 +1,10 @@
 #!/bin/zsh
 
 # Choix possibles
-options="Étendre\nDupliquer (Miroir)\nDP-1 Uniquement\nDP-2 Uniquement"
+choices="Étendre\nDupliquer (Miroir)\nDP-1 Uniquement\nDP-2 Uniquement"
 
 # Affiche le menu Rofi
-choice=$(echo "$options" | rofi -dmenu -p "Affichage")
+choice=$(echo "$choices" | rofi -dmenu -p "Affichage")
 
 # Fonction pour recharger l'interface (Waybar + Wallpaper)
 reload_ui() {
