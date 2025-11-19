@@ -121,7 +121,7 @@ fi
 {{- if lookPath "cargo" }}
   export PATH="$HOME/.cargo/bin:$PATH"
   [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
-{{- end -}}
+{{- end }}
 
 # fzf keybindings & completion (paths vary by OS/distro)
 {{- $os := .chezmoi.os -}}
