@@ -11,9 +11,39 @@ source "${ZINIT_HOME}/zinit.zsh"
 export NVM_AUTO_USE=true
 
 # General editor settings
-export EDITOR='nvim'
-export VISUAL='nvim'
-export SUDO_EDITOR='nvim'
+if command -v brew >/dev/null 2>&1; then
+  BREW_PREFIX="$(brew --prefix 2>/dev/null)"
+  if [ -n "$BREW_PREFIX" ] && [ -d "$BREW_PREFIX" ]; then
+    if [ -d "$BREW_PREFIX/bin" ]; then
+      export PATH="$BREW_PREFIX/bin:$PATH"
+    fi
+    if [ -d "$BREW_PREFIX/sbin" ]; then
+      export PATH="$BREW_PREFIX/sbin:$PATH"
+    fi
+    # Prefer Homebrew neovim if present
+    if [ -x "$BREW_PREFIX/bin/nvim" ]; then
+      NVIM_BIN="$BREW_PREFIX/bin/nvim"
+    fi
+  fi
+fi
+
+if [ -z "$NVIM_BIN" ]; then
+  for p in /opt/homebrew/bin/nvim /usr/local/bin/nvim; do
+    if [ -x "$p" ]; then NVIM_BIN="$p"; break; fi
+  done
+fi
+
+if [ -n "$NVIM_BIN" ]; then
+  export EDITOR="$NVIM_BIN"
+  export VISUAL="$NVIM_BIN"
+  export SUDO_EDITOR="$NVIM_BIN"
+  alias vim="$NVIM_BIN"
+else
+  export EDITOR='nvim'
+  export VISUAL='nvim'
+  export SUDO_EDITOR='nvim'
+  alias vim='nvim'
+fi
 
 # Core plugins (cross-platform)
 zinit light zsh-users/zsh-syntax-highlighting
@@ -72,9 +102,8 @@ zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 
 # Generic aliases
-alias vim='nvim'
 alias c='clear'
-alias sudo='sudo '
+alias sudo='sudo -E '
 alias ubun-attach="sudo lxc-attach -n ubun --clear-env -v TERM=xterm-256color -u 1001"
 # b => bat
 {{- if lookPath "bat" }}
