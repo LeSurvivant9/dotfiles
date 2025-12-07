@@ -193,6 +193,19 @@ label:focus {
     border-radius: 5px;
 }
 
+#custom-dunst {
+    padding: 0 10px;
+    color: #cdd6f4;
+}
+
+#custom-dunst.dnd {
+    color: #f38ba8;
+}
+
+#custom-dunst.active {
+    color: #f9e2af;
+}
+
 #temperature {
     background-color: #f0932b;
 }
