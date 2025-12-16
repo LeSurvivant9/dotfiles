@@ -128,6 +128,11 @@ if [ -d "${BUN_INSTALL:-$HOME/.bun}/bin" ]; then
   export PATH="${BUN_INSTALL:-$HOME/.bun}/bin:$PATH"
 fi
 
+# Bun: complétions (si le fichier existe)
+if [ -s "${BUN_INSTALL:-$HOME/.bun}/_bun" ]; then
+  source "${BUN_INSTALL:-$HOME/.bun}/_bun"
+fi
+
 # Atuin standalone install (curl) bootstrap
 if [ -d "$HOME/.atuin/bin" ]; then
   export PATH="$HOME/.atuin/bin:$PATH"
@@ -149,6 +154,11 @@ fi
 {{- if lookPath "symfony" }}
   [[ -f "$HOME/.symfony_completion" ]] || symfony completion zsh > "$HOME/.symfony_completion"
   source "$HOME/.symfony_completion"
+{{- end }}
+
+# ngrok: complétions (si présent)
+{{- if lookPath "ngrok" }}
+  eval "$(ngrok completion)"
 {{- end }}
 
 # Cargo (if present)
@@ -190,6 +200,12 @@ fi
 {{- if eq $os "darwin" }}
   # LLVM from Homebrew (if installed)
   export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+
+  # JAVA_HOME (si java_home 21 est disponible)
+  if command -v /usr/libexec/java_home >/dev/null 2>&1; then
+    JAVA_21="$([ -x /usr/libexec/java_home ] && /usr/libexec/java_home -v 21 2>/dev/null)"
+    [ -n "$JAVA_21" ] && export JAVA_HOME="$JAVA_21"
+  fi
 
   # Bitwarden SSH agent socket (macOS)
   # Prefer the .dmg install socket, fall back to Mac App Store container path.
