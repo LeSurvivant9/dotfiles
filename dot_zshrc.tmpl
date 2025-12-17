@@ -167,6 +167,22 @@ fi
   [[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
 {{- end }}
 
+# ---------------- Outils Dockerisés ----------------
+{{- if lookPath "docker" }}
+  beet() {
+    docker exec -i beets beet "$@"
+  }
+
+  if docker ps --format '{{.Names}}' 2>/dev/null | grep -q '^beets$'; then
+    if [ -z "${_BASHCOMPINIT_DONE:-}" ]; then
+      autoload -Uz bashcompinit 2>/dev/null || true
+      bashcompinit 2>/dev/null || true
+      _BASHCOMPINIT_DONE=1
+    fi
+    eval "$(docker exec -i beets beet completion 2>/dev/null)"
+  fi
+{{- end }}
+
 # fzf keybindings & completion (paths vary by OS/distro)
 {{- $os := .chezmoi.os -}}
 {{- $rel := .chezmoi.osRelease -}}
