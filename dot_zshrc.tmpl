@@ -78,6 +78,7 @@ bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 
 # Load completions
+fpath=(~/.zsh/completion $fpath)
 autoload -U compinit && compinit
 
 zinit cdreplay -q
@@ -172,15 +173,6 @@ fi
   beet() {
     docker exec -i beets beet "$@"
   }
-
-  if docker ps --format '{{ "{{" }}.Names{{ "}}" }}' 2>/dev/null | grep -q '^beets$'; then
-    if [ -z "${_BASHCOMPINIT_DONE:-}" ]; then
-      autoload -Uz bashcompinit 2>/dev/null || true
-      bashcompinit 2>/dev/null || true
-      _BASHCOMPINIT_DONE=1
-    fi
-    eval "$(docker exec -i beets beet completion 2>/dev/null)"
-  fi
 {{- end }}
 
 # fzf keybindings & completion (paths vary by OS/distro)
