@@ -108,16 +108,24 @@ alias sudo='sudo -E '
 alias ubun-attach="sudo lxc-attach -n ubun --clear-env -v TERM=xterm-256color -u 1001"
 # b => bat
 {{- if lookPath "bat" }}
-  alias b='bat'
+alias b='bat'
 {{- else }}
   # bat non installé: installez-le avec Homebrew (brew install bat)
   # On ne stoppe pas le chargement du shell; l'alias ne sera pas défini.
 {{- end }}
 # l => eza listing (prefer eza if available)
 {{- if lookPath "eza" }}
-  alias l='eza -l -F -h -a --group-directories-first --icons=auto'
+lc() {
+local total=$(eza -1a "$@" | wc -l | xargs)
+local dirs=$(eza -1A --only-dirs "$@" 2>/dev/null | wc -l | xargs)
+local files=$(eza -1a --only-files "$@" 2>/dev/null | wc -l | xargs)
+print -P "%B$total%b éléments (%F{green}$dirs%f dossiers, %F{yellow}$files%f fichiers)\n"
+
+eza -l -F -h -a --group-directories-first --icons=auto "$@"
+}
+alias l='lc'
 {{- else }}
-  alias l='ls -lFha'
+alias l='ls -lFha'
 {{- end }}
 
 # Shell integrations
