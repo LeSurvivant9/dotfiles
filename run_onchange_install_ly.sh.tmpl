@@ -3,5 +3,5 @@
 echo "Detecting change in Ly configuration. Deploying..."
 sudo cp {{ joinPath .chezmoi.sourceDir "root/etc/ly/config.ini" }} /etc/ly/config.ini
 
-sudo systemctl restart ly@tty2.service
+# sudo systemctl restart ly@tty2.service
 
