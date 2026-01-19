@@ -14,12 +14,9 @@ export NVM_AUTO_USE=true
 if command -v brew >/dev/null 2>&1; then
   BREW_PREFIX="$(brew --prefix 2>/dev/null)"
   if [ -n "$BREW_PREFIX" ] && [ -d "$BREW_PREFIX" ]; then
-    if [ -d "$BREW_PREFIX/bin" ]; then
-      export PATH="$BREW_PREFIX/bin:$PATH"
-    fi
-    if [ -d "$BREW_PREFIX/sbin" ]; then
-      export PATH="$BREW_PREFIX/sbin:$PATH"
-    fi
+    # Ensure Homebrew's bin and sbin are at the very front of PATH
+    export PATH="$BREW_PREFIX/bin:$BREW_PREFIX/sbin${PATH:+:$PATH}"
+    
     # Prefer Homebrew neovim if present
     if [ -x "$BREW_PREFIX/bin/nvim" ]; then
       NVIM_BIN="$BREW_PREFIX/bin/nvim"
@@ -164,6 +161,15 @@ fi
 {{- if lookPath "atuin" }}
   eval "$(atuin init zsh)"
 {{- end }}
+
+# Homebrew Python overrides
+if command -v brew >/dev/null 2>&1; then
+  BREW_BIN="$(brew --prefix)/bin"
+  if [ -f "$BREW_BIN/python3" ]; then
+    alias python="$BREW_BIN/python3"
+    alias pip="$BREW_BIN/pip3"
+  fi
+fi
 
 # Symfony CLI completion (if present)
 {{- if lookPath "symfony" }}
